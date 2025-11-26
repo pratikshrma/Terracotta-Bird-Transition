@@ -1,7 +1,7 @@
 import { useGLTF, useTexture} from "@react-three/drei";
 import CustomShaderMaterial from "three-custom-shader-material";
 import { MeshPhysicalMaterial } from "three";
-import { useRef, useState } from "react";
+import { useRef} from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import fragmentShader from "../Shaders/Bird/frag.glsl?raw";
@@ -10,9 +10,9 @@ import gsap from "gsap";
 
 function Experience() {
   const uProgressRef = useRef(-3);
-  const [scaleMultiplier, setScaleMultiplier] = useState(1.05);
   const scale = useRef({ value: 1.0 });
-
+  
+  // const { nodes } = useGLTF("/models/terrracotaOptimisedPoly.glb");
   const { nodes } = useGLTF("/models/terrracotaOptimisedPoly.glb");
   console.log(nodes)
   const [
@@ -35,7 +35,7 @@ function Experience() {
       "/textures/IceTexture/ice-1_displacement.jpg",
       "/textures/IceTexture/ice-1_normal.jpg",
     ]);
-  const groupRef = useRef(null);
+  const groupRef = useRef<any>(null);
   const materialRef = useRef<any>(null);
   // const { actions, names } = useAnimations(animations, groupRef);
 
@@ -70,9 +70,6 @@ function Experience() {
       value: 1.0,
       duration: 0.5,
       ease: "power2.out",
-      onUpdate: () => {
-        setScaleMultiplier(scale.current.value);
-      },
     });
   };
 
@@ -82,9 +79,6 @@ function Experience() {
       value: 1.05,
       duration: 0.5,
       ease: "power2.out",
-      onUpdate: () => {
-        setScaleMultiplier(scale.current.value);
-      },
     });
   };
 
@@ -113,6 +107,10 @@ function Experience() {
       // const uProgressMatNormalized = uProgressGeo * (1.9 - -2.8) - 2.8;
       materialRef.current.uniforms.uProgress.value = uProgressRef.current;
     }
+    if (groupRef.current) {
+      const s = 8 * scale.current.value;
+      groupRef.current.scale.set(s, s, s);
+    }
   });
 
   return (
@@ -120,7 +118,7 @@ function Experience() {
       ref={groupRef}
       dispose={null}
       position={[-1,0,0]} 
-      scale={[8 * scaleMultiplier, 8 * scaleMultiplier, 8 * scaleMultiplier]}
+      scale={[8,8,8]}
       onClick={startAnimation}
       onPointerEnter={applyHoverEffects}
       onPointerLeave={removeHoverEffects}
@@ -130,8 +128,8 @@ function Experience() {
           ref={materialRef}
           attach="material"
           baseMaterial={MeshPhysicalMaterial}
-          // Glass Properties
-          transmission={1.0}
+          // Glass Property
+          transmission={0.5}
           roughness={0.0}
           ior={1.5}
           thickness={1.0}
