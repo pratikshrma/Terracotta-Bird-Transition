@@ -128,7 +128,7 @@ function Experience() {
     <group
       ref={groupRef}
       dispose={null}
-      position={[-2,0,0]} 
+      position={[-1,0,0]} 
       scale={[8 * scaleMultiplier, 8 * scaleMultiplier, 8 * scaleMultiplier]}
       onClick={startAnimation}
       onPointerEnter={applyHoverEffects}
