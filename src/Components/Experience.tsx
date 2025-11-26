@@ -17,6 +17,7 @@ function Experience() {
   const scale = useRef({ value: 1.0 });
 
   const { nodes } = useGLTF("/models/Vat_TerracottaModel.glb");
+  // const { scene} = useGLTF("/models/watertank.glb");
   const { uNoiseScale, uIceBandWidth, uNoisePositionScale, uNoisePower, uDistortionFactor, uBumpStrength } = useControls({
     uNoiseScale: {
       value: 0.38,
@@ -157,7 +158,7 @@ function Experience() {
         uAnimationProgress.current;
     }
     if (groupRef.current) {
-      const s = 4 * scale.current.value;
+      const s = 3 * scale.current.value;
       groupRef.current.scale.set(s, s, s);
     }
   });
@@ -165,7 +166,6 @@ function Experience() {
   return (
     <group
       ref={groupRef}
-      dispose={null}
       position={[-2, 1, 0]}
       onClick={startAnimation}
       onPointerEnter={applyHoverEffects}

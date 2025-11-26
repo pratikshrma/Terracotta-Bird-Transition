@@ -9,7 +9,7 @@ import * as THREE from 'three'
 const App = () => {
   return (
     <>
-      <Leva />
+      <Leva collapsed />
       <Canvas
         gl={{
           toneMapping:THREE.ACESFilmicToneMapping,
