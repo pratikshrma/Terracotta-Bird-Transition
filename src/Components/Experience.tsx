@@ -1,12 +1,11 @@
-import { useGLTF, useTexture, useAnimations } from "@react-three/drei";
+import { useGLTF, useTexture} from "@react-three/drei";
 import CustomShaderMaterial from "three-custom-shader-material";
 import { MeshPhysicalMaterial } from "three";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import fragmentShader from "../Shaders/Bird/frag.glsl?raw";
 import vertexShader from "../Shaders/Bird/vert.glsl?raw";
-import { useControls } from "leva";
 import gsap from "gsap";
 
 function Experience() {
@@ -14,16 +13,8 @@ function Experience() {
   const [scaleMultiplier, setScaleMultiplier] = useState(1.05);
   const scale = useRef({ value: 1.0 });
 
-  const { uProgressGeo } = useControls({
-    uProgressGeo: {
-      value: 0.0,
-      min: 0,
-      max: 1,
-      step: 0.001,
-    },
-  });
-
-  const { nodes, animations } = useGLTF("/models/terracotta.glb");
+  const { nodes } = useGLTF("/models/terrracotaOptimisedPoly.glb");
+  console.log(nodes)
   const [
     terracottaColorMap,
     terracottaAOMap,
@@ -46,7 +37,7 @@ function Experience() {
     ]);
   const groupRef = useRef(null);
   const materialRef = useRef<any>(null);
-  const { actions, names } = useAnimations(animations, groupRef);
+  // const { actions, names } = useAnimations(animations, groupRef);
 
   const startAnimation = () => {
     const tl = gsap.timeline();
@@ -63,14 +54,14 @@ function Experience() {
         ease: "power3",
       },
     );
-    if (actions && actions[names[0]]) {
-      const action = actions[names[0]];
-      if (action) {
-        action.reset();
-        action.time = 10.2;
-        action.play();
-      }
-    }
+    // if (actions && actions[names[0]]) {
+    //   const action = actions[names[0]];
+    //   if (action) {
+    //     action.reset();
+    //     action.time = 10.2;
+    //     action.play();
+    //   }
+    // }
   };
 
   const applyHoverEffects = () => {
@@ -97,22 +88,22 @@ function Experience() {
     });
   };
 
-  useEffect(() => {
-    if (!names.length) return;
-
-    const first = names[0];
-    if (actions && actions[first]) {
-      // actions[first].play();
-      const action = actions[first];
-      const duration = action.getClip().duration;
-      action.reset();
-      action.play();
-      action.paused = true; // Pause the animation to allow manual scrubbing
-
-      const uProgressGeoNormalized = uProgressGeo * (9 - 3) + 3;
-      action.time = ((uProgressGeoNormalized + 1) / duration) * 2; // Map uProgressGeo (-1 to 1) to animation time (0 to duration)
-    }
-  }, [actions, names, uProgressGeo]);
+  // useEffect(() => {
+  //   if (!names.length) return;
+  //
+  //   const first = names[0];
+  //   if (actions && actions[first]) {
+  //     // actions[first].play();
+  //     const action = actions[first];
+  //     const duration = action.getClip().duration;
+  //     action.reset();
+  //     action.play();
+  //     action.paused = true; // Pause the animation to allow manual scrubbing
+  //
+  //     const uProgressGeoNormalized = uProgressGeo * (9 - 3) + 3;
+  //     action.time = ((uProgressGeoNormalized + 1) / duration) * 2; // Map uProgressGeo (-1 to 1) to animation time (0 to duration)
+  //   }
+  // }, [actions, names, uProgressGeo]);
 
   const noiseMap = useTexture("/noise/noise.png");
   noiseMap.wrapS = noiseMap.wrapT = THREE.RepeatWrapping;
@@ -134,7 +125,7 @@ function Experience() {
       onPointerEnter={applyHoverEffects}
       onPointerLeave={removeHoverEffects}
     >
-      <primitive object={nodes.Sphere010}>
+      <primitive object={nodes.Optimised}>
         <CustomShaderMaterial
           ref={materialRef}
           attach="material"
