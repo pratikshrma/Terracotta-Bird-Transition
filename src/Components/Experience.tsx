@@ -38,14 +38,14 @@ function Experience() {
     "/textures/TerracottaTexturesPNG/TexturesCom_Terracotta_Plain_1K_roughness.png",
   ]);
 
-  const [iceTextureColorMap, iceTextureDispMap, iceTextureNormalMap] =
+  const [iceTextureColorMap, _iceTextureDispMap, _iceTextureNormalMap] =
     useTexture([
       "/textures/IceTexture/ice-1_diffuse.jpg",
       "/textures/IceTexture/ice-1_displacement.jpg",
       "/textures/IceTexture/ice-1_normal.jpg",
     ]);
   const groupRef = useRef(null);
-  const materialRef = useRef(null);
+  const materialRef = useRef<any>(null);
   const { actions, names } = useAnimations(animations, groupRef);
 
   const startAnimation = () => {
