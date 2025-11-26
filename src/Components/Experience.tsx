@@ -1,20 +1,63 @@
-import { useGLTF, useTexture} from "@react-three/drei";
+import { useGLTF, useTexture } from "@react-three/drei";
 import CustomShaderMaterial from "three-custom-shader-material";
 import { MeshPhysicalMaterial } from "three";
-import { useRef} from "react";
+import { useRef, useLayoutEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import fragmentShader from "../Shaders/Bird/frag.glsl?raw";
 import vertexShader from "../Shaders/Bird/vert.glsl?raw";
 import gsap from "gsap";
+import { useLoader } from "@react-three/fiber";
+import { EXRLoader } from "three/examples/jsm/Addons.js";
+import { useControls } from "leva";
 
 function Experience() {
-  const uProgressRef = useRef(-3);
+  const uProgressRef = useRef(-0.8);
+  const uAnimationProgress = useRef(0.0);
   const scale = useRef({ value: 1.0 });
-  
-  // const { nodes } = useGLTF("/models/terrracotaOptimisedPoly.glb");
-  const { nodes } = useGLTF("/models/terrracotaOptimisedPoly.glb");
-  console.log(nodes)
+
+  const { nodes } = useGLTF("/models/Vat_TerracottaModel.glb");
+  const { uNoiseScale, uIceBandWidth, uNoisePositionScale, uNoisePower, uDistortionFactor, uBumpStrength } = useControls({
+    uNoiseScale: {
+      value: 0.38,
+      min: 0.0,
+      max: 1.0,
+    },
+    uIceBandWidth: {
+      value: 0.22,
+      min: 0.0,
+      max: 1.0,
+    },
+    uProgress: {
+      value: -1.,
+      min: -2.0,
+      max: 3.0,
+      onChange: (value) => {
+        uProgressRef.current = value;
+      },
+    },
+    uNoisePositionScale: {
+      value: 1.76,
+      min: 0.0,
+      max: 2.0,
+    },
+    uNoisePower: {
+      value: 5.0,
+      min: 0.0,
+      max: 10.0,
+    },
+    uDistortionFactor: {
+      value: 0.4,
+      min: 0.0,
+      max: 2.0,
+    },
+    uBumpStrength: {
+      value: 0.04,
+      min: 0.0,
+      max: 0.2,
+    },
+  });
+
   const [
     terracottaColorMap,
     terracottaAOMap,
@@ -35,9 +78,39 @@ function Experience() {
       "/textures/IceTexture/ice-1_displacement.jpg",
       "/textures/IceTexture/ice-1_normal.jpg",
     ]);
-  const groupRef = useRef<any>(null);
+
+  const VAT_positionsTerracotta = useLoader(
+    EXRLoader,
+    "/textures/Vat_positionsTerracotta.exr",
+    (loader) => {
+      loader.setDataType(THREE.HalfFloatType);
+    },
+  );
+  const VAT_normalsTerracotta = useLoader(
+    EXRLoader,
+    "/textures/Vat_normalsTerracotta.exr",
+    (loader) => {
+      loader.setDataType(THREE.HalfFloatType);
+    },
+  );
+  console.log(VAT_positionsTerracotta)
+  useLayoutEffect(() => {
+    // Apply settings once, safely
+    VAT_positionsTerracotta.minFilter = THREE.NearestFilter;
+    VAT_positionsTerracotta.magFilter = THREE.NearestFilter;
+    VAT_positionsTerracotta.generateMipmaps = false;
+    VAT_positionsTerracotta.mapping = THREE.UVMapping;
+    VAT_positionsTerracotta.needsUpdate = true;
+    
+    VAT_normalsTerracotta.minFilter = THREE.NearestFilter;
+    VAT_normalsTerracotta.magFilter = THREE.NearestFilter;
+    VAT_normalsTerracotta.generateMipmaps = false;
+    VAT_normalsTerracotta.mapping = THREE.UVMapping;
+    VAT_normalsTerracotta.needsUpdate = true;
+  }, [VAT_positionsTerracotta,VAT_normalsTerracotta]);
+
+  const groupRef = useRef<THREE.Group>(null);
   const materialRef = useRef<any>(null);
-  // const { actions, names } = useAnimations(animations, groupRef);
 
   const startAnimation = () => {
     const tl = gsap.timeline();
@@ -45,23 +118,15 @@ function Experience() {
     tl.fromTo(
       uProgressRef,
       {
-        current: -2.8,
+        current: -0.8,
       },
       {
-        current: 1.9,
-        duration: 4,
+        current: 3.6,
+        duration: 5,
         overwrite: true,
         ease: "power3",
       },
     );
-    // if (actions && actions[names[0]]) {
-    //   const action = actions[names[0]];
-    //   if (action) {
-    //     action.reset();
-    //     action.time = 10.2;
-    //     action.play();
-    //   }
-    // }
   };
 
   const applyHoverEffects = () => {
@@ -82,33 +147,17 @@ function Experience() {
     });
   };
 
-  // useEffect(() => {
-  //   if (!names.length) return;
-  //
-  //   const first = names[0];
-  //   if (actions && actions[first]) {
-  //     // actions[first].play();
-  //     const action = actions[first];
-  //     const duration = action.getClip().duration;
-  //     action.reset();
-  //     action.play();
-  //     action.paused = true; // Pause the animation to allow manual scrubbing
-  //
-  //     const uProgressGeoNormalized = uProgressGeo * (9 - 3) + 3;
-  //     action.time = ((uProgressGeoNormalized + 1) / duration) * 2; // Map uProgressGeo (-1 to 1) to animation time (0 to duration)
-  //   }
-  // }, [actions, names, uProgressGeo]);
-
-  const noiseMap = useTexture("/noise/noise.png");
+  const noiseMap = useTexture("/noise/noise2.png");
   noiseMap.wrapS = noiseMap.wrapT = THREE.RepeatWrapping;
 
   useFrame(() => {
     if (materialRef.current) {
-      // const uProgressMatNormalized = uProgressGeo * (1.9 - -2.8) - 2.8;
       materialRef.current.uniforms.uProgress.value = uProgressRef.current;
+      materialRef.current.uniforms.uAnimationProgress.value =
+        uAnimationProgress.current;
     }
     if (groupRef.current) {
-      const s = 8 * scale.current.value;
+      const s = 4 * scale.current.value;
       groupRef.current.scale.set(s, s, s);
     }
   });
@@ -117,13 +166,12 @@ function Experience() {
     <group
       ref={groupRef}
       dispose={null}
-      position={[-1,0,0]} 
-      scale={[8,8,8]}
+      position={[-2, 1, 0]}
       onClick={startAnimation}
       onPointerEnter={applyHoverEffects}
       onPointerLeave={removeHoverEffects}
     >
-      <primitive object={nodes.Optimised}>
+      <primitive object={nodes.export_mesh}>
         <CustomShaderMaterial
           ref={materialRef}
           attach="material"
@@ -136,16 +184,24 @@ function Experience() {
           transparent={true}
           side={THREE.DoubleSide}
           uniforms={{
-            uProgress: { value: -1.8 },
+            uVatPositions: { value: VAT_positionsTerracotta },
+            uTextureWidth: { value: VAT_positionsTerracotta.image.width},
+            uVatNormals: { value: VAT_normalsTerracotta },
+            uAnimationProgress: { value: uAnimationProgress.current },
+            uProgress: { value: uProgressRef.current },
             uNoiseMap: { value: noiseMap },
-            uNoiseScale: { value: 0.2 },
+            uNoiseScale: { value: uNoiseScale },
             uTerracottaColorMap: { value: terracottaColorMap },
             uTerracottaNormalMap: { value: terracottaNormalMap },
             uTerracottaAOMap: { value: terracottaAOMap },
             uTerracottaHeightMap: { value: terracottaHeightMap },
             uTerracottaRoughnessMap: { value: terracottaRoughnessMap },
             uIceTextureColorMap: { value: iceTextureColorMap },
-            uIceBandWidth: { value: 0.2 },
+            uIceBandWidth: { value: uIceBandWidth },
+            uNoisePositionScale: { value: uNoisePositionScale },
+            uNoisePower: { value: uNoisePower },
+            uDistortionFactor: { value: uDistortionFactor },
+            uBumpStrength: { value: uBumpStrength },
           }}
           vertexShader={vertexShader}
           fragmentShader={fragmentShader}

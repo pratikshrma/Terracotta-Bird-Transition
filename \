@@ -1,0 +1,19 @@
+varying vec3 vPosition;
+varying vec3 vCustomNormal;
+varying vec2 vUv;
+
+uniform sampler2D uVatPositions;
+uniform float uAnimationProgress;
+void main() {
+  vPosition = position;
+  vUv = uv;
+  vCustomNormal=normal;
+
+
+
+  vec2 lookup=vec2(uAnimationProgress,uv.x);
+  vec3 posOffset=texture2D(uVatPositions,lookup).rgb;
+  vec3 finalPos=position+posOffset;
+
+  csm_Position=finalPos;
+}
