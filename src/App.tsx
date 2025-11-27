@@ -13,8 +13,9 @@ const App = () => {
       <Canvas
         gl={{
           toneMapping:THREE.ACESFilmicToneMapping,
-          toneMappingExposure:1.0
-        }}
+          toneMappingExposure:1.0,
+          }}
+        dpr={1}
       >
         {/* <Perf position="top-left"/> */}
         <PerspectiveCamera makeDefault position={[-6,0,6]} fov={50}/>

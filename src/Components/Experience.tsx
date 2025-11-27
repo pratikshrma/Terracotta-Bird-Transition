@@ -177,7 +177,7 @@ function Experience() {
           attach="material"
           baseMaterial={MeshPhysicalMaterial}
           // Glass Property
-          transmission={0.5}
+          transmission={1}
           roughness={0.0}
           ior={1.5}
           thickness={1.0}
