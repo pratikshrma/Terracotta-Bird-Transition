@@ -163,6 +163,9 @@ function Experience() {
     }
   });
 
+  const envTexture=useLoader(EXRLoader,"/textures/studio_small_03_1k.exr")
+  console.log(envTexture)
+
   return (
     <group
       ref={groupRef}
@@ -173,6 +176,7 @@ function Experience() {
     >
       <primitive object={nodes.export_mesh}>
         <CustomShaderMaterial
+          envMap={envTexture}
           ref={materialRef}
           attach="material"
           baseMaterial={MeshPhysicalMaterial}
